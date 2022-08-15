@@ -20,5 +20,5 @@ if __name__ == "__main__":
     os.system(cmd1)
     cmd2 = "allure generate reports/allure_raw -o reports/allure_report --clean"
     os.system(cmd2)
-
+    print("aaa")
 

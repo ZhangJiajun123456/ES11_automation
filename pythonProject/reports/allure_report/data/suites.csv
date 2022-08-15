@@ -1,2 +1,0 @@
-"Status","Start Time","Stop Time","Duration in ms","Parent Suite","Suite","Sub Suite","Test Class","Test Method","Name","Description"
-"passed","Fri Aug 12 16:47:12 CST 2022","Fri Aug 12 16:47:12 CST 2022","73","TestCase","test_CpuInfo","","","","test_main","测试CPU total占用率"

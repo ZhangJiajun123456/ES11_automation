@@ -1,16 +1,26 @@
-
-
+# -*- coding:utf-8 -*-
+#  zlgcan.py
+#
+#  ~~~~~~~~~~~~
+#
+#  ZLGCAN API
+#
+#  ~~~~~~~~~~~~
+#
+#  ------------------------------------------------------------------
+#  Author : guochuangjian
+#  Last change: 21.02.2019
+#
+#  Language: Python 2.7, 3.6
+#  ------------------------------------------------------------------
+#
 from ctypes import *
 import platform
-
-
 
 ZCAN_DEVICE_TYPE = c_uint
 
 INVALID_DEVICE_HANDLE = 0
 INVALID_CHANNEL_HANDLE = 0
-global zcanlib
-
 
 '''
  Device Type
@@ -445,5 +455,107 @@ def can_start(zcanlib, device_handle, chn):
     zcanlib.StartCAN(chn_handle)
     return chn_handle
 
+
 if __name__ == "__main__":
-    pass
+    zcanlib = ZCAN()
+    handle = zcanlib.OpenDevice(ZCAN_USBCANFD_200U, 0, 0)
+    if handle == INVALID_DEVICE_HANDLE:
+        print("Open Device failed!")
+        exit(0)
+    print("device handle:%d." % (handle))
+
+    info = zcanlib.GetDeviceInf(handle)
+    print("Device Information:\n%s" % (info))
+
+    # Start CAN
+    chn_handle = can_start(zcanlib, handle, 0)
+    print("channel handle:%d." % (chn_handle))
+
+    # Send CAN Messages
+    transmit_num = 1
+    msgs = ZCAN_Transmit_Data()
+    for i in range(transmit_num):
+        msgs.transmit_type = 2
+        msgs.frame.eff = 0
+        msgs.frame.rtr = 0
+        msgs.frame.can_id = int('336', 16)
+        msgs.frame.can_dlc = 8
+        str1 = "28 80 00 64 00 00 00 00"
+        data1 = str1.split(' ')
+        msgs.frame.data[0] = int(data1[0], 16)
+        msgs.frame.data[1] = int(data1[1], 16)
+        msgs.frame.data[2] = int(data1[2], 16)
+        msgs.frame.data[3] = int(data1[3], 16)
+        msgs.frame.data[4] = int(data1[4], 16)
+        msgs.frame.data[5] = int(data1[5], 16)
+        msgs.frame.data[6] = int(data1[6], 16)
+        msgs.frame.data[7] = int(data1[7], 16)
+    # msgs = (ZCAN_Transmit_Data * transmit_num)()
+    # for i in range(transmit_num):
+    #     msgs[i].transmit_type = 2  # Send Self
+    #     msgs[i].frame.eff = 0  # extern frame
+    #     msgs[i].frame.rtr = 0  # remote frame
+    #     msgs[i].frame.can_id = 0x336
+    #     msgs[i].frame.can_dlc = 8
+    #     msgs[i].frame.data[0] = 28
+    #     msgs[i].frame.data[1] = 80
+    #     msgs[i].frame.data[2] = 0
+    #     msgs[i].frame.data[3] = 64
+    #     msgs[i].frame.data[4] = 0
+    #     msgs[i].frame.data[5] = 0
+    #     msgs[i].frame.data[6] = 0
+    #     msgs[i].frame.data[7] = 0
+        # for j in range(msgs[i].frame.can_dlc):
+        #     msgs[i].frame.data[j] = j
+
+    ret = zcanlib.Transmit(chn_handle, msgs, transmit_num)
+    print("Tranmit Num: %d." % ret)
+
+    # Send CANFD Messages
+    # transmit_canfd_num = 10
+    # canfd_msgs = (ZCAN_TransmitFD_Data * transmit_canfd_num)()
+    # for i in range(transmit_canfd_num):
+    #     canfd_msgs[i].transmit_type = 2  # Send Self
+    #     canfd_msgs[i].frame.eff = 0  # extern frame
+    #     canfd_msgs[i].frame.rtr = 0  # remote frame
+    #     canfd_msgs[i].frame.brs = 1  # BRS
+    #     canfd_msgs[i].frame.can_id = i
+    #     canfd_msgs[i].frame.len = 8
+    #     for j in range(canfd_msgs[i].frame.len):
+    #         canfd_msgs[i].frame.data[i] = j
+    # ret = zcanlib.TransmitFD(chn_handle, canfd_msgs, transmit_canfd_num)
+    # print("Tranmit CANFD Num: %d." % ret)
+    #
+    # Receive Messages
+    while True:
+        rcv_num = zcanlib.GetReceiveNum(chn_handle, ZCAN_TYPE_CAN)
+        rcv_canfd_num = zcanlib.GetReceiveNum(chn_handle, ZCAN_TYPE_CANFD)
+        if rcv_num:
+            print("Receive CAN message number:%d" % rcv_num)
+            rcv_msg, rcv_num = zcanlib.Receive(chn_handle, rcv_num)
+            for i in range(rcv_num):
+                print("[%d]:ts:%d, id:%d, dlc:%d, eff:%d, rtr:%d, data:%s" % (i, rcv_msg[i].timestamp,
+                                                                              rcv_msg[i].frame.can_id,
+                                                                              rcv_msg[i].frame.can_dlc,
+                                                                              rcv_msg[i].frame.eff,
+                                                                              rcv_msg[i].frame.rtr,
+                                                                              ''.join(
+                                                                                  str(rcv_msg[i].frame.data[j]) + ' '
+                                                                                  for j in
+                                                                                  range(rcv_msg[i].frame.can_dlc))))
+        elif rcv_canfd_num:
+            print("Receive CANFD message number:%d" % rcv_canfd_num)
+            rcv_canfd_msgs, rcv_canfd_num = zcanlib.ReceiveFD(chn_handle, rcv_canfd_num, 1000)
+            for i in range(rcv_canfd_num):
+                print("[%d]:ts:%d, id:%d, len:%d, eff:%d, rtr:%d, esi:%d, brs: %d, data:%s" % (
+                    i, rcv_canfd_msgs[i].timestamp, rcv_canfd_msgs[i].frame.can_id, rcv_canfd_msgs[i].frame.len,
+                    rcv_canfd_msgs[i].frame.eff, rcv_canfd_msgs[i].frame.rtr,
+                    rcv_canfd_msgs[i].frame.esi, rcv_canfd_msgs[i].frame.brs,
+                    ''.join(str(rcv_canfd_msgs[i].frame.data[j]) + ' ' for j in range(rcv_canfd_msgs[i].frame.len))))
+        else:
+            break
+
+    # Close CAN
+    zcanlib.ResetCAN(chn_handle)
+    # Close Device
+    zcanlib.CloseDevice(handle)

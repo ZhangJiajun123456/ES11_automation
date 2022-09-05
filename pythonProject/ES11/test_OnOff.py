@@ -5,7 +5,7 @@
 @Author  : Zhang jiajun
 @Github  :
 @Software: PyCharm
-@File    : test_OnOff(KL30).py
+@File    : test_OnOff.py
 开关机测试（KL30）
 操作步骤：
 1) KL30 on

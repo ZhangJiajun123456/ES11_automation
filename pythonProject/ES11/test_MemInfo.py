@@ -19,7 +19,7 @@ def test_main():
     output = str(output.stdout.read())
     print(output)
     # dd1 = re.findall(r"Total RAM: (\d*)", output)
-    dd1 = re.findall(r"Total RAM: \d\,",output)
+    dd1 = re.findall(r"Total RAM: ([0-9,]{3,}),",output)
     print(dd1)
 
 if __name__ == "__main__":

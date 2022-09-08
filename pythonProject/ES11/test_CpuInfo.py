@@ -10,7 +10,6 @@
 
 import re
 import subprocess
-import pytest
 import allure
 
 @allure.description('测试CPU total占用率')

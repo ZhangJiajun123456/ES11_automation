@@ -21,21 +21,18 @@
 
 import os
 import time
-
 from Common import common
+
 vehicle = "1234567"
 phone  = "3TG0221820007792"
 device = common.Test(vehicle,phone)
 
 def test_interaction():
+
     try:
-        #判断蓝牙是否连接
-        os.system('adb -s 1234567 shell am start com.beantechs.settings/com.beantechs.settings.ui.activity.MainActivity')
-        #判断BT是否连接
-        time.sleep(2)
-        if not device.d1(text='DISCONNECT').exists(timeout=3):
-            device.BT_connect()
-            time.sleep(1)
+        device.close_VehicleBT()
+        device.close_PhoneBT()
+        device.BT_connect()
         # 播放音乐
         while True:
             device.play_BTmusic()
@@ -57,8 +54,8 @@ def test_interaction():
             device.d1(resourceId='com.beantechs.mediacenter:id/iv_control_pre').click()
             time.sleep(1)
             #切换主题
-            cmd = "adb -s 1234567 shell am start com.beantechs.settings/com.beantechs.settings.ui.activity.MainActivity"
-            os.system(cmd)
+            os.system('adb -s 1234567 shell am start com.beantechs.settings/com.beantechs.settings.ui.activity.MainActivity')
+            time.sleep(1)
             device.d1(resourceId="com.beantechs.settings:id/tv_control", text="Individual").click()
             time.sleep(1)
             device.d1.xpath('//*[@text="Dashboard Screen"]').click()
@@ -77,14 +74,14 @@ def test_interaction():
             device.d1(resourceId='com.beantechs.mediacenter:id/play_pause').click()
             time.sleep(1)
             #拨打电话
-            device.call_vehicleside(10010)
+            device.call_vehicleside(10086)
             time.sleep(5)
             #挂断电话
             device.endcall_vehicleside()
             time.sleep(1)
             # 切换主题
-            cmd = "adb -s 1234567 shell am start com.beantechs.settings/com.beantechs.settings.ui.activity.MainActivity"
-            os.system(cmd)
+            os.system('adb -s 1234567 shell am start com.beantechs.settings/com.beantechs.settings.ui.activity.MainActivity')
+            time.sleep(1)
             device.d1(resourceId="com.beantechs.settings:id/tv_control", text="Individual").click()
             time.sleep(1)
             device.d1.xpath('//*[@text="Dashboard Screen"]').click()
@@ -96,19 +93,19 @@ def test_interaction():
             time.sleep(1)
             device.d1.xpath('//*[@text="ADAS Mode"]').click_exists(2)
             #切回FM播放然后拨打电话
+            os.system('adb -s 1234567 shell am start com.beantechs.mediacenter/com.beantechs.mediacenter.ui.HomeActivity')
+            time.sleep(1)
             device.d1(resourceId='com.beantechs.mediacenter:id/tab_local_radio').click()
             time.sleep(1)
             device.d1(resourceId='com.beantechs.mediacenter:id/tv_fm').click()
             time.sleep(1)
-            device.call_vehicleside(10010)
+            device.call_vehicleside(10086)
             time.sleep(5)
-            device.endcall_vehicleside()
-            time.sleep(1)
             #挂断电话
             device.endcall_vehicleside()
             # 切换主题
-            cmd = "adb -s 1234567 shell am start com.beantechs.settings/com.beantechs.settings.ui.activity.MainActivity"
-            os.system(cmd)
+            os.system('adb -s 1234567 shell am start com.beantechs.settings/com.beantechs.settings.ui.activity.MainActivity')
+            time.sleep(1)
             device.d1(resourceId="com.beantechs.settings:id/tv_control", text="Individual").click()
             time.sleep(1)
             device.d1.xpath('//*[@text="Dashboard Screen"]').click()

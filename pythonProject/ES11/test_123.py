@@ -8,21 +8,16 @@
 @File    : test_123.py
 """
 import os
-
-from PIL import ImageGrab
-import time
 from Common import common
-from Common import screen_compare as sc
-from PIL import Image
-import creative
-import xlrd2
-import linkedin
+
+
 vehicle = "1234567"
 phone  = "3TG0221820007792"
 device = common.Test(vehicle,phone)
 
 
-
+def run():
+    os.system('adb -s 1234567 shell am start com.beantechs.mediacenter/.ui.LaunchActivity')
 
 
 
@@ -64,5 +59,8 @@ if __name__ == "__main__":
     #     print(True)
     # info = device.d1.xpath('//*[@resource-id="com.beantechs.settings:id/sw_daynight"]/android.view.View[1]').info
     # print(info)
-    i = 5.6
-    print(int(i))
+    # i = 5.6
+    # print(int(i))
+    # sc.image_contrast('ign_on.png','1.png')
+    # sc.screenshot()
+    run()

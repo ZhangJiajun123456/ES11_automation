@@ -16,13 +16,11 @@
 
 import os
 import time
-
-import pytest
 import uiautomator2 as u2
 
 d =u2.connect("1234567")
 class Test:
-    def test_SwitchBetweenMusicAndVideo(self):
+    def test_run(self):
         try:
             while True:
                 os.system("adb -s 1234567 shell am start com.beantechs.mediacenter/com.beantechs.mediacenter.ui.HomeActivity")     #进入多媒体画面
@@ -60,10 +58,7 @@ class Test:
         except Exception as result:
             print(result)
         finally:
-            Test().test_SwitchBetweenMusicAndVideo()
-
-
-
+            Test().test_run()
 
 if __name__ == "__main__":
-    Test().test_SwitchBetweenMusicAndVideo()
+    Test().test_run()

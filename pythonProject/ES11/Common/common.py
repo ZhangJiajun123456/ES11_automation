@@ -46,20 +46,21 @@ class Test:
         res = self.d2(resourceId="com.android.settings:id/switch_widget").info
         if res['checked'] != True:
             self.d2.xpath('//*[@resource-id="com.android.settings:id/switch_widget"]').click()
-        for i in range(3):
-            if self.d2(text = "ORA_1266").exists(timeout=10):
-                print('找到了')
-                self.d2(text = "ORA_1266").click()
-                break
-            else:
+        if self.d2(text = "ORA_1266").exists(timeout=10):
+            print('找到了')
+            self.d2(text = "ORA_1266").click()
+        else:
+            for i in range(3):
                 self.d2.swipe(192,1973,192,1133)
                 time.sleep(1)
-                print('找不到')
+                if self.d2(text = "ORA_1266").exists(timeout=10):
+                    self.d2(text="ORA_1266").click()
+                    break
+        time.sleep(1)
+        self.d1(text = "PAIR").click()
         if self.d2(text = "配对").exists(timeout=5):
             self.d2(text = "配对").click()
-        time.sleep(2)
-        self.d1(text = "PAIR").click()
-        time.sleep(2)
+            time.sleep(2)
         if self.d2(text = "允许").exists(timeout=5):
             self.d2(text = "允许").click()
 
@@ -103,16 +104,30 @@ class Test:
         self.d1(text='CONNECT').click()
         time.sleep(2)
 
-     #取消配对并关闭车机和手机蓝牙
-    def close_BT(self):
+     #取消配对并关闭车机蓝牙
+    def close_VehicleBT(self):
         os.system('adb -s 1234567 shell am start com.beantechs.settings/com.beantechs.settings.ui.activity.MainActivity')
         time.sleep(2)
-        self.d1.xpath('//*[@resource-id="com.beantechs.settings:id/rv_control"]/android.view.ViewGroup[1]/android.widget.TextView[1]').click()
+        self.d1.xpath('//*[@text="Bluetooth"]').click()
         time.sleep(2)
-        self.d1(text = "DELETE").click()
+        if self.d1(resourceId='com.beantechs.settings:id/sw_ble').info['text']!='ON':
+            self.d1.xpath('//*[@resource-id="com.beantechs.settings:id/sw_ble"]').click()
+            time.sleep(5)
+        while True:
+            if self.d1(resourceId='com.beantechs.settings:id/bt_ble_current_delete').exists(timeout=3):
+                self.d1(resourceId='com.beantechs.settings:id/bt_ble_current_delete').click()
+                time.sleep(2)
+            elif self.d1(resourceId='com.beantechs.settings:id/bt_item_delete').exists(timeout=3):
+                self.d1(resourceId='com.beantechs.settings:id/bt_item_delete').click()
+                time.sleep(2)
+            else:
+                break
         time.sleep(2)
         self.d1.xpath('//*[@resource-id="com.beantechs.settings:id/sw_ble"]').click()
         time.sleep(2)
+
+    #取消配对并关闭手机蓝牙
+    def close_PhoneBT(self):
         self.d2.press('home')  # 回到home
         time.sleep(2)
         self.d2(text="设置").click()
@@ -122,9 +137,17 @@ class Test:
             time.sleep(1)
         self.d2(text="蓝牙").click()
         time.sleep(2)
-        self.d2.xpath('//*[@content-desc="详情按钮"]').click()
-        time.sleep(2)
-        self.d2(text = "取消配对").click()
+        if not self.d2(resourceId='com.android.settings:id/switch_widget').info['checked']:
+            self.d2(resourceId='com.android.settings:id/switch_widget').click()
+            time.sleep(2)
+        while True:
+            if self.d2(description='详情按钮').exists:
+                self.d2(description='详情按钮').click()
+                time.sleep(2)
+                self.d2(text="取消配对").click()
+                time.sleep(2)
+            else:
+                break
         time.sleep(2)
         self.d2.xpath('//*[@resource-id="com.android.settings:id/switch_widget"]').click()
 
@@ -141,9 +164,10 @@ class Test:
         self.d1.xpath('//*[@resource-id="com.beantechs.mediacenter:id/tab_bt_music"]/android.widget.FrameLayout[1]').click()
         time.sleep(2)
         self.d1.screenshot(r'D:\ES11\ES11_automation\TestPicture\01.png')
-        sc.screenshot('01.png',(956,544,1092,680),'01.png')
+        sc.screenshot('01.png',(896,544,1032,680),'01.png')
         time.sleep(2)
         res = sc.image_contrast('pause_status.png','01.png')
+        print(res)
         if res == 0.0:
             self.d1.xpath('//*[@resource-id="com.beantechs.mediacenter:id/play_pause"]').click()
         time.sleep(2)
@@ -153,7 +177,7 @@ class Test:
     def call_vehicleside(self,phoneNumber):
         os.system('adb -s 1234567 shell am start com.beantechs.btphone/com.beantechs.btphone.activity.MainActivity')
         time.sleep(1)
-        self.d1.long_click(594,590,2)
+        self.d1.xpath('//*[@resource-id="com.beantechs.btphone:id/main_dialpad_del_btn"]').long_click()
         num = str(phoneNumber)
         for i in num:
             i = int(i)
@@ -161,9 +185,22 @@ class Test:
                 self.d1.xpath('//*[@resource-id="com.beantechs.btphone:id/num_recycler"]/android.widget.LinearLayout[11]').click()
             elif i == 1:
                 self.d1.xpath('//*[@resource-id="com.beantechs.btphone:id/num_recycler"]/android.widget.LinearLayout[1]').click()
-            else:
-                i = i - 1
-                self.d1(index=i).click()
+            elif i == 2:
+                self.d1.xpath('//*[@resource-id="com.beantechs.btphone:id/num_recycler"]/android.widget.LinearLayout[2]').click()
+            elif i == 3:
+                self.d1.xpath('//*[@resource-id="com.beantechs.btphone:id/num_recycler"]/android.widget.LinearLayout[3]').click()
+            elif i == 4:
+                self.d1.xpath('//*[@resource-id="com.beantechs.btphone:id/num_recycler"]/android.widget.LinearLayout[4]').click()
+            elif i == 5:
+                self.d1.xpath('//*[@resource-id="com.beantechs.btphone:id/num_recycler"]/android.widget.LinearLayout[5]').click()
+            elif i == 6:
+                self.d1.xpath('//*[@resource-id="com.beantechs.btphone:id/num_recycler"]/android.widget.LinearLayout[6]').click()
+            elif i == 7:
+                self.d1.xpath('//*[@resource-id="com.beantechs.btphone:id/num_recycler"]/android.widget.LinearLayout[7]').click()
+            elif i == 8:
+                self.d1.xpath('//*[@resource-id="com.beantechs.btphone:id/num_recycler"]/android.widget.LinearLayout[8]').click()
+            elif i == 9:
+                self.d1.xpath('//*[@resource-id="com.beantechs.btphone:id/num_recycler"]/android.widget.LinearLayout[9]').click()
             time.sleep(0.5)
         self.d1(resourceId='com.beantechs.btphone:id/main_dial_btn').click()
 
@@ -180,4 +217,56 @@ class Test:
             self.d1.xpath('//*[@resource-id="com.beantechs.btphone:id/incaller_terminate_btn"]').click()
 
 
+    #关闭弹窗Telephone isn't responding
+    def close_noRespondingWindow(self):
+        time.sleep(2)
+        if self.d1(text='Telephone isn\'t responding').exists:
+            self.d1(text='Close app').click()
+            time.sleep(2)
+            
+    #切换黑夜模式
+    def DarkMode(self):
+        self.d1.xpath('//*[@text="Display"]').click()
+        time.sleep(1)
+        for i in range(2):
+            self.d1.swipe(1364, 151, 1364, 651)
+            time.sleep(1)
+        self.d1.swipe(1364, 651, 1364, 151)
+        time.sleep(1)
+        os.system('adb -s 1234567 shell input tap 1000 500')
+        time.sleep(1)
+        
+    #切换白天模式
+    def LightMode(self):
+        time.sleep(1)
+        self.d1.xpath('//*[@text="Display"]').click()
+        time.sleep(1)
+        for i in range(2):
+            self.d1.swipe(1364, 151, 1364, 651)
+            time.sleep(1)
+        self.d1.swipe(1364, 651, 1364, 151)
+        time.sleep(1)
+        os.system('adb -s 1234567 shell input tap 1200 500')
+        time.sleep(1)
+        
+    #切换模式
+    def individual(self):
+        self.d1(resourceId="com.beantechs.settings:id/tv_control", text="Individual").click()
+        time.sleep(1)
+        self.d1.xpath('//*[@text="Dashboard Screen"]').click()
+        time.sleep(1)
+        self.d1.xpath('//*[@resource-id="com.beantechs.settings:id/rb_shoudong"]').click()
+        self.d1.swipe(500, 442, 500, 642)
+        time.sleep(1)
+        self.d1.xpath('//*[@text="Digital Mode"]').click()
+        time.sleep(1)
+        self.d1.xpath('//*[@text="Minimalist Mode"]').click()
+        time.sleep(1)
+        self.d1.swipe(500, 642, 500, 442)
+        time.sleep(1)
+        self.d1.xpath('//*[@text="ADAS Mode"]').click_exists(2)
+        time.sleep(1)
 
+
+
+    

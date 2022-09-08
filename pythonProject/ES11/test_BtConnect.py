@@ -21,14 +21,18 @@
 
 import time
 from Common import common
+
 vehicle = "1234567"
 phone  = "3TG0221820007792"
 device = common.Test(vehicle,phone)
 
-
-def test_btConnect():
+def test_run():
     try:
         while True:
+            device.close_VehicleBT()
+            time.sleep(2)
+            device.close_PhoneBT()
+            time.sleep(2)
             device.BT_connect()
             time.sleep(3)
             device.BT_disconnect_vehicle()
@@ -37,12 +41,16 @@ def test_btConnect():
             time.sleep(3)
             device.BT_disconnect_phone()
             time.sleep(3)
-            device.close_BT()
-            time.sleep(3)
+            device.close_VehicleBT()
+            time.sleep(2)
+            device.close_PhoneBT()
+            time.sleep(2)
     except Exception as e:
-        print(e)
+        count = 0
+        device.d1.screenshot('D:\ES11\ES11_automation\TestPicture\{}.png'.format(count))
+        count+=1
     finally:
-        test_btConnect()
+        test_run()
 
 if __name__ == "__main__":
-    test_btConnect()
+    test_run()

@@ -17,34 +17,32 @@
    6)重复操作以上步骤持续12小时"
 
 """
-import os
-import time
 
+import time
 from Common import common
+
 vehicle = "1234567"
 phone  = "3TG0221820007792"
 device = common.Test(vehicle,phone)
 
-def test_phoneCall():
+def test_run():
     try:
-        os.system('adb -s 1234567 shell am start com.beantechs.settings/com.beantechs.settings.ui.activity.MainActivity')
-        #判断BT是否连接
-        if not device.d1(text='DISCONNECT').exists(timeout=3):
-            device.BT_connect()
-            time.sleep(1)
+        device.close_VehicleBT()
+        device.close_PhoneBT()
+        device.BT_connect()
         while True:
             #播放音乐
             device.play_BTmusic()
             time.sleep(2)
             #车机端打电话，参数为需拨打的电话号码
-            device.call_vehicleside(10010)
+            device.call_vehicleside(10086)
             time.sleep(10)
             #车机端挂断电话
             device.endcall_vehicleside()
     except Exception as e:
         print(e)
     finally:
-        test_phoneCall()
+        test_run()
 
 if __name__ == "__main__":
-    test_phoneCall()
+    test_run()
